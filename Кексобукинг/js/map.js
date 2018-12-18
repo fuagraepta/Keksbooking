@@ -37,7 +37,7 @@ var OFFERS_INFORMATION = {
   'features': ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
   'photos': ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'],
   'x': {
-    'min': 355,
+    'min': 0,
     'max': 1180,
   },
   'y': {
@@ -150,7 +150,7 @@ var offers = createOfferDataList(authors, filling);
 var renderOfferCoords = function (offersMark) {
   var pin = mapPinTemplate.cloneNode(true);
   pin.style = 'left:' + offersMark.location.x + 'px;' + 'top:' +
-  (offersMark.location.y - MAP_PIN_HEIGHT / 2 - MAP_PIN_TAIL_HEIGHT) + 'px';
+  (offersMark.location.y - MAP_PIN_TAIL_HEIGHT) + 'px';
   pin.firstElementChild.src = offersMark.author.avatar;
   pin.firstElementChild.alt = offersMark.offer.title;
   return pin;
