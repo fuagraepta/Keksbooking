@@ -1,13 +1,25 @@
 'use strict';
 
 var map = document.querySelector('.map');
-map.classList.remove('map--faded');
+var mapPinMain = map.querySelector('.map__pin--main');
+var noticeForm = document.querySelector('.notice__form');
+var allFieldsets = noticeForm.querySelectorAll('fieldset');
 var mapCardTemplate = document.querySelector('template')
 .content.querySelector('.map__card');
 var mapPinTemplate = document.querySelector('template')
 .content.querySelector('.map__pin');
-var MAP_PIN_TAIL_HEIGHT = 18;
-var MAP_PIN_HEIGHT = 44;
+var PIN_WIDTH = 40;
+var PIN_HEIGHT = 44;
+var PIN_TAIL = 18;
+// var MAIN_PIN_TAIL = 22;
+// var MAIN_PIN_WIDTH = 65;
+// var MAIN_PIN_HEIGHT = 65;
+var MAP_X_MAX_COORD = 1200;
+var MAP_Y_MAX_COORD = 750;
+var X_MAX_COORD = MAP_X_MAX_COORD - PIN_WIDTH / 2;
+var X_MIN_COORD = 0;
+var Y_MAX_COORD = 630;
+var Y_MIN_COORD = 130;
 var OFFER_TYPE_RU = {
   'palace': 'Дворец',
   'flat': 'Квартира',
@@ -35,15 +47,7 @@ var OFFERS_INFORMATION = {
   'checkin': ['12:00', '13:00', '14:00'],
   'checkout': ['12:00', '13:00', '14:00'],
   'features': ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
-  'photos': ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'],
-  'x': {
-    'min': 0,
-    'max': 1180,
-  },
-  'y': {
-    'min': 130,
-    'max': 630
-  }
+  'photos': ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg']
 };
 
 // Вспомогательные функции
@@ -51,7 +55,7 @@ var OFFERS_INFORMATION = {
 // Функия получения случайного значения
 var getRandomValue = function (max, min) {
   if (min) {
-    return Math.floor(Math.random() * (max)) + min;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   } else {
     return Math.floor(Math.random() * (max));
   }
@@ -87,6 +91,35 @@ var getDefiniteElement = function (parentElement, elementSelector, elementConten
 };
 
 // Основной код
+
+// Деактивация карты и формы для подачи объявления
+var getInitialMainPinCoords = function () {
+  var inputAddress = noticeForm.querySelector('#address');
+  inputAddress.value = MAP_X_MAX_COORD / 2 + ', ' + MAP_Y_MAX_COORD / 2;
+};
+
+var disabledFormAndMap = function () {
+  map.classList.add('.map--faded');
+  for (var i = 0; i < allFieldsets.length; i++) {
+    allFieldsets[i].disabled = true;
+    getInitialMainPinCoords();
+  }
+};
+
+disabledFormAndMap();
+
+// Активация карты и формы для подачи объявления
+var enabledFormAndMap = function () {
+  noticeForm.classList.remove('notice__form--disabled');
+  map.classList.remove('map--faded');
+  for (var i = 0; i < allFieldsets.length; i++) {
+    allFieldsets[i].disabled = false;
+  }
+};
+
+mapPinMain.addEventListener('mouseup', function () {
+  enabledFormAndMap();
+});
 
 // Генерация списка авторов объявлений
 var getAutorList = function (AuthorNumber) {
@@ -134,11 +167,11 @@ var createOfferDataList = function (offerAuthor, offerContent) {
       },
       offer: offerContent[i],
       location: {
-        x: getRandomValue(OFFERS_INFORMATION.x.max, OFFERS_INFORMATION.x.min),
-        y: getRandomValue(OFFERS_INFORMATION.y.max, OFFERS_INFORMATION.y.min)
+        x: getRandomValue(X_MAX_COORD, X_MIN_COORD),
+        y: getRandomValue(Y_MAX_COORD, Y_MIN_COORD)
       },
     };
-    offer.offer.address = offer.location.x + ',' + ' ' + offer.location.y;
+    offer.offer.address = offer.location.x + ',' + ' ' + (offer.location.y - (PIN_TAIL + PIN_HEIGHT / 2));
     offersList.push(offer);
   }
   return offersList;
@@ -150,7 +183,7 @@ var offers = createOfferDataList(authors, filling);
 var renderOfferCoords = function (offersMark) {
   var pin = mapPinTemplate.cloneNode(true);
   pin.style = 'left:' + offersMark.location.x + 'px;' + 'top:' +
-  (offersMark.location.y - MAP_PIN_TAIL_HEIGHT) + 'px';
+  offersMark.location.y + 'px';
   pin.firstElementChild.src = offersMark.author.avatar;
   pin.firstElementChild.alt = offersMark.offer.title;
   return pin;
@@ -158,7 +191,7 @@ var renderOfferCoords = function (offersMark) {
 
 // Добавление метки объявления в DOM
 var addOfferCoords = function (element) {
-  var mapPins = document.querySelector('.map__pins');
+  var mapPins = map.querySelector('.map__pins');
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < element.length; i++) {
@@ -172,14 +205,9 @@ addOfferCoords(offers);
 // Отрисовка объявления
 var markingOffer = function (advertising) {
   var popup = mapCardTemplate.cloneNode(true);
+  popup.classList.add('hidden');
   var popupAvatar = getDefiniteElement(popup, '.popup__avatar'); // Аватарка
   popupAvatar.src = advertising.author.avatar;
-  var popupPrice = getDefiniteElement(popup, '.popup__text--price', advertising.offer.price); // Цена
-  popupPrice.textContent += ' ₽/Ночь';
-  var popupCapacity = getDefiniteElement(popup, '.popup__text--capacity'); // Вмистительность помешения
-  popupCapacity.textContent = advertising.offer.rooms + ' комнаты для ' + advertising.offer.guests + ' гостей';
-  var popupTime = getDefiniteElement(popup, '.popup__text--time');
-  popupTime.textContent = 'Заезд после ' + advertising.offer.checkin + ', выезд до ' + advertising.offer.checkout;
   var popupFeatures = popup.querySelectorAll('.feature'); // Преимушества
 
   for (var i = 0; i < popupFeatures.length; i++) {
@@ -194,14 +222,16 @@ var markingOffer = function (advertising) {
   for (var j = 0; j < advertising.offer.photos.length; j++) {
     var itemImg = document.createElement('img');
     itemImg.src = advertising.offer.photos[j];
-    itemImg.style.width = '60px';
-    itemImg.style.height = '60px';
+    itemImg.style.cssText = 'width: 60px; height: 60px;';
     popupPhotoItem.appendChild(itemImg);
   }
 
   getDefiniteElement(popup, '.popup__title', advertising.offer.title); // Заголовок объявления
   getDefiniteElement(popup, '.popup__text--address', advertising.offer.address); // Адресс объявления
+  getDefiniteElement(popup, '.popup__text--price', advertising.offer.price + ' ₽/Ночь'); // Цена
   getDefiniteElement(popup, '.popup__type', OFFER_TYPE_RU[advertising.offer.type]); // Тип жилья
+  getDefiniteElement(popup, '.popup__text--capacity', advertising.offer.rooms + ' комнаты для ' + advertising.offer.guests + ' гостей'); // Количество гостей + количество комнат
+  getDefiniteElement(popup, '.popup__text--time', 'Заезд после ' + advertising.offer.checkin + ', выезд до ' + advertising.offer.checkout); // Время заезда + время выезда.
   getDefiniteElement(popup, '.popup__description', advertising.offer.description); // Описание
 
   return popup;
@@ -209,13 +239,26 @@ var markingOffer = function (advertising) {
 
 // Добавление объявления в DOM
 var addAdvertising = function (element) {
-  var mapFilters = document.querySelector('.map__filters-container');
+  var mapFilters = map.querySelector('.map__filters-container');
   var fragment = document.createDocumentFragment();
 
-  for (var i = 0; i < 1; i++) {
+  for (var i = 0; i < OFFER_NUMBER; i++) {
     fragment.appendChild(markingOffer(element[i]));
     map.insertBefore(fragment, mapFilters);
   }
 };
 
 addAdvertising(offers);
+
+var pins = map.querySelectorAll('.map__pin');
+var cards = map.querySelectorAll('.map__card');
+
+var pinClickHendler = function (evt) {
+  if (evt.target.tagName === 'BUTTON' && evt.target.classList.contains('map__pin--main') === false) {
+    evt.target.classList.add('map__pin--active');
+    cards[evt.target].classList.remove('hidden');
+  }
+};
+
+// map.removeEventListener('click', pinClickHendler);
+map.addEventListener('click', pinClickHendler);
