@@ -8,6 +8,7 @@ var mapCardTemplate = document.querySelector('template')
 .content.querySelector('.map__card');
 var mapPinTemplate = document.querySelector('template')
 .content.querySelector('.map__pin');
+var ESC_KEYCODE = 27;
 var PIN_WIDTH = 40;
 var PIN_HEIGHT = 44;
 var PIN_TAIL = 18;
@@ -20,6 +21,7 @@ var X_MAX_COORD = MAP_X_MAX_COORD - PIN_WIDTH / 2;
 var X_MIN_COORD = 0;
 var Y_MAX_COORD = 630;
 var Y_MIN_COORD = 130;
+var HALF = 2;
 var OFFER_TYPE_RU = {
   'palace': 'Дворец',
   'flat': 'Квартира',
@@ -92,33 +94,55 @@ var getDefiniteElement = function (parentElement, elementSelector, elementConten
 
 // Основной код
 
-// Деактивация карты и формы для подачи объявления
+// Получение начальных кординат основной метки
 var getInitialMainPinCoords = function () {
   var inputAddress = noticeForm.querySelector('#address');
-  inputAddress.value = MAP_X_MAX_COORD / 2 + ', ' + MAP_Y_MAX_COORD / 2;
+  inputAddress.value = MAP_X_MAX_COORD / HALF + ', ' + MAP_Y_MAX_COORD / HALF;
 };
 
-var disabledFormAndMap = function () {
-  map.classList.add('.map--faded');
+// Деактивация формы для подачи объявления
+var disabledForm = function () {
   for (var i = 0; i < allFieldsets.length; i++) {
     allFieldsets[i].disabled = true;
     getInitialMainPinCoords();
   }
 };
 
-disabledFormAndMap();
+// Деактивация карты
+var disabledMap = function () {
+  map.classList.add('map--faded');
+  disabledForm();
+};
 
-// Активация карты и формы для подачи объявления
-var enabledFormAndMap = function () {
-  noticeForm.classList.remove('notice__form--disabled');
-  map.classList.remove('map--faded');
+disabledMap();
+
+// Активация формы для подачи объявления
+var enabledForm = function () {
   for (var i = 0; i < allFieldsets.length; i++) {
     allFieldsets[i].disabled = false;
   }
 };
 
+// Активация меток на карте
+var enabledPins = function () {
+  var pins = map.querySelectorAll('.map__pin');
+  for (var i = 1; i < pins.length; i++) {
+    pins[i].classList.remove('hidden');
+  }
+  return pins;
+};
+
+// Активация карты и формы для подачи объявления
+var enabledMap = function () {
+  noticeForm.classList.remove('notice__form--disabled');
+  map.classList.remove('map--faded');
+  enabledForm();
+  addEventToPin(enabledPins());
+  // getPins();
+};
+
 mapPinMain.addEventListener('mouseup', function () {
-  enabledFormAndMap();
+  enabledMap();
 });
 
 // Генерация списка авторов объявлений
@@ -182,6 +206,7 @@ var offers = createOfferDataList(authors, filling);
 // Отрисовка метки объявления
 var renderOfferCoords = function (offersMark) {
   var pin = mapPinTemplate.cloneNode(true);
+  pin.classList.add('hidden');
   pin.style = 'left:' + offersMark.location.x + 'px;' + 'top:' +
   offersMark.location.y + 'px';
   pin.firstElementChild.src = offersMark.author.avatar;
@@ -190,7 +215,7 @@ var renderOfferCoords = function (offersMark) {
 };
 
 // Добавление метки объявления в DOM
-var addOfferCoords = function (element) {
+var addOfferMark = function (element) {
   var mapPins = map.querySelector('.map__pins');
   var fragment = document.createDocumentFragment();
 
@@ -200,12 +225,11 @@ var addOfferCoords = function (element) {
   }
 };
 
-addOfferCoords(offers);
+addOfferMark(offers);
 
 // Отрисовка объявления
 var markingOffer = function (advertising) {
   var popup = mapCardTemplate.cloneNode(true);
-  popup.classList.add('hidden');
   var popupAvatar = getDefiniteElement(popup, '.popup__avatar'); // Аватарка
   popupAvatar.src = advertising.author.avatar;
   var popupFeatures = popup.querySelectorAll('.feature'); // Преимушества
@@ -241,24 +265,69 @@ var markingOffer = function (advertising) {
 var addAdvertising = function (element) {
   var mapFilters = map.querySelector('.map__filters-container');
   var fragment = document.createDocumentFragment();
+  fragment.appendChild(markingOffer(element));
+  map.insertBefore(fragment, mapFilters);
+};
 
-  for (var i = 0; i < OFFER_NUMBER; i++) {
-    fragment.appendChild(markingOffer(element[i]));
-    map.insertBefore(fragment, mapFilters);
+// Выбор похожих объявлений
+
+// Открыть попап с объявлением
+var openPopup = function (offer) {
+  addAdvertising(offer);
+  document.addEventListener('keydown', popupPressEscHendler);
+  var popupClose = map.querySelector('.popup__close');
+  popupClose.addEventListener('click', closePopup);
+};
+
+// Закрыть попап с объявлением
+var closePopup = function () {
+  if (map.querySelector('.popup')) {
+    var popup = map.querySelector('.popup');
+    map.removeChild(popup);
+    unmarkPin();
+  }
+  document.removeEventListener('keydown', popupPressEscHendler);
+};
+
+// Закрытие попап по нажатию на ESC
+var popupPressEscHendler = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup();
   }
 };
 
-addAdvertising(offers);
+// Маркировка выбраной на карте отметки
+var markPin = function (pin) {
+  pin.classList.add('map__pin--active');
+};
 
-var pins = map.querySelectorAll('.map__pin');
-var cards = map.querySelectorAll('.map__card');
-
-var pinClickHendler = function (evt) {
-  if (evt.target.tagName === 'BUTTON' && evt.target.classList.contains('map__pin--main') === false) {
-    evt.target.classList.add('map__pin--active');
-    cards[evt.target].classList.remove('hidden');
+// Снятие маркировки с отметки
+var unmarkPin = function () {
+  var pins = map.querySelectorAll('.map__pin');
+  for (var i = 1; i < pins.length; i++) {
+    pins[i].classList.remove('map__pin--active');
   }
 };
 
-// map.removeEventListener('click', pinClickHendler);
-map.addEventListener('click', pinClickHendler);
+// Добавление обработчиков событий для открытия и закрытия объявления по щелчку на каждую метку
+var addPinClickHendler = function (pin, offer) {
+  pin.addEventListener('click', function () {
+    openPopup(offer);
+    markPin(pin);
+  });
+};
+
+
+var addEventToPin = function (pins) {
+  for (var i = 0; i < offers.length; i++) {
+    pins[i + 1].addEventListener('click', function () {
+      closePopup();
+    });
+    addPinClickHendler(pins[i + 1], offers[i]);
+  }
+};
+
+// Заполнение и валидация формы отправки объяления
+
+var selectType = noticeForm.querySelector('#type');
+console.log(selectType);
