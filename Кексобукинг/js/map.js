@@ -330,4 +330,41 @@ var addEventToPin = function (pins) {
 // Заполнение и валидация формы отправки объяления
 
 var selectType = noticeForm.querySelector('#type');
-console.log(selectType);
+var price = noticeForm.querySelector('#price');
+var timein = noticeForm.querySelector('#timein');
+var timeout = noticeForm.querySelector('#timeout');
+var roomNumber = noticeForm.querySelector('#room_number');
+var capacity = noticeForm.querySelector('#capacity');
+
+// Функция синхронизации двух селектов
+var synchTime = function (selectOne, selectTwo) {
+  selectOne.value = selectTwo.value;
+};
+
+// При выборе типа жилья меняется минимальная стоимость
+selectType.addEventListener('input', function () {
+  if (selectType.value === 'flat') {
+    price.min = 1000;
+    price.placeholder = 1000;
+  }
+  if (selectType.value === 'bungalo') {
+    price.min = 0;
+    price.placeholder = 0;
+  }
+  if (selectType.value === 'house') {
+    price.min = 5000;
+    price.placeholder = 5000;
+  }
+  if (selectType.value === 'palace') {
+    price.min = 10000;
+    price.placeholder = 10000;
+  }
+});
+
+// Время заезда синхронизируется со временем выезда
+timein.addEventListener('change', function () {
+  synchTime(timeout, timein);
+});
+timeout.addEventListener('change', function () {
+  synchTime(timein, timeout);
+});
