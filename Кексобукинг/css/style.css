@@ -630,6 +630,15 @@ textarea:focus {
   font: 14px Roboto, sans-serif;
 }
 
+.tip {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  color: #FF0000;
+}
+
+.invalid {
+  box-shadow: 0 0 4px 1px #FF0000;
+}
 
 .footer {
   box-sizing: border-box;
