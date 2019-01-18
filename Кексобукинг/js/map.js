@@ -3,7 +3,7 @@
 var map = document.querySelector('.map');
 var mapPinMain = map.querySelector('.map__pin--main');
 var noticeForm = document.querySelector('.notice__form');
-var allFieldsets = noticeForm.querySelectorAll('fieldset');
+var allNoticeFormInputs = noticeForm.querySelectorAll('input');
 var mapCardTemplate = document.querySelector('template')
 .content.querySelector('.map__card');
 var mapPinTemplate = document.querySelector('template')
@@ -103,8 +103,8 @@ var getInitialMainPinCoords = function () {
 // Деактивация формы для подачи объявления
 var disabledForm = function () {
   noticeForm.classList.add('notice__form--disabled');
-  for (var i = 0; i < allFieldsets.length; i++) {
-    allFieldsets[i].disabled = true;
+  for (var i = 0; i < allNoticeFormInputs.length; i++) {
+    allNoticeFormInputs[i].disabled = true;
   }
 };
 
@@ -128,8 +128,8 @@ disabledMap();
 // Активация формы для подачи объявления
 var enabledForm = function () {
   noticeForm.classList.remove('notice__form--disabled');
-  for (var i = 0; i < allFieldsets.length; i++) {
-    allFieldsets[i].disabled = false;
+  for (var i = 0; i < allNoticeFormInputs.length; i++) {
+    allNoticeFormInputs[i].disabled = false;
   }
 };
 
@@ -338,15 +338,17 @@ var addEventToPin = function (pins) {
 
 // Заполнение и валидация формы отправки объяления
 
+// При желании можно отключить добавление подсказки этому полю
 var title = noticeForm.querySelector('#title');
 var titleTip = noticeForm.querySelector('.title_tip');
+
 var selectType = noticeForm.querySelector('#type');
 var price = noticeForm.querySelector('#price');
 var timein = noticeForm.querySelector('#timein');
 var timeout = noticeForm.querySelector('#timeout');
 var roomNumber = noticeForm.querySelector('#room_number');
-var capacity = noticeForm.querySelector('#capacity');
 var roomNumberTip = noticeForm.querySelector('.room_number_tip');
+var capacity = noticeForm.querySelector('#capacity');
 var reset = noticeForm.querySelector('.form__reset');
 
 // Функция синхронизации двух селектов
@@ -367,6 +369,7 @@ var removeTip = function (tip) {
   tip.classList.add('hidden');
 };
 
+//  Размещение делегирование формы отправки на не валидные поля.
 noticeForm.addEventListener('invalid', function (evt) {
   var target = evt.target;
   if (target.validity.valid === false) {
@@ -375,6 +378,7 @@ noticeForm.addEventListener('invalid', function (evt) {
 }, true);
 
 // Показывает сообщение для описания в случаи не валидности поля
+// При желании можно отключить
 title.addEventListener('input', function () {
   if (title.value.length < 30) {
     title.setCustomValidity('Описание должно стотоять минимум из 30 символов');
