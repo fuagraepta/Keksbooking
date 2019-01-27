@@ -12,13 +12,12 @@ var ESC_KEYCODE = 27;
 var PIN_WIDTH = 40;
 var PIN_HEIGHT = 44;
 var PIN_TAIL = 18;
-// var MAIN_PIN_TAIL = 22;
-// var MAIN_PIN_WIDTH = 65;
-// var MAIN_PIN_HEIGHT = 65;
-var MAP_X_MAX_COORD = 1200;
-var MAP_Y_MAX_COORD = 750;
-var X_MAX_COORD = MAP_X_MAX_COORD - PIN_WIDTH / 2;
-var X_MIN_COORD = 0;
+var MAIN_PIN_TAIL = 20;
+var MAIN_PIN_HEIGHT = 60;
+var MAP_WIDTH = 1200;
+var MAP_HEIGHT = 750;
+var X_MAX_COORD = MAP_WIDTH - PIN_WIDTH / 2;
+var X_MIN_COORD = PIN_WIDTH / 2;
 var Y_MAX_COORD = 630;
 var Y_MIN_COORD = 130;
 var HALF = 2;
@@ -51,6 +50,7 @@ var OFFERS_INFORMATION = {
   'features': ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
   'photos': ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg']
 };
+
 
 // Вспомогательные функции
 
@@ -94,10 +94,16 @@ var getDefiniteElement = function (parentElement, elementSelector, elementConten
 
 // Основной код
 
-// Получение начальных кординат основной метки
+// Получение  кординат основной метки
 var getInitialMainPinCoords = function () {
   var inputAddress = noticeForm.querySelector('#address');
-  inputAddress.value = MAP_X_MAX_COORD / HALF + ', ' + MAP_Y_MAX_COORD / HALF;
+  inputAddress.value = mapPinMain.offsetLeft + ', ' + (mapPinMain.offsetTop + MAIN_PIN_HEIGHT / HALF + MAIN_PIN_TAIL);
+};
+
+// Сброс кординат основной метки по умолчанию
+var setMainPinCoordsDefault = function () {
+  mapPinMain.style.left = MAP_WIDTH / HALF + 'px';
+  mapPinMain.style.top = MAP_HEIGHT / HALF + 'px';
 };
 
 // Деактивация формы для подачи объявления
@@ -121,9 +127,62 @@ var disabledMap = function () {
   map.classList.add('map--faded');
   disabledPins();
   disabledForm();
+  setMainPinCoordsDefault();
 };
 
 disabledMap();
+
+// Drag and drop основной метки объявления
+
+mapPinMain.addEventListener('mousedown', function (evt) {
+
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    if (mapPinMain.offsetTop < Y_MIN_COORD) {
+      mapPinMain.style.top = Y_MIN_COORD + 'px';
+    } if (mapPinMain.offsetTop > Y_MAX_COORD) {
+      mapPinMain.style.top = Y_MAX_COORD + 'px';
+    } if (mapPinMain.offsetLeft < X_MIN_COORD) {
+      mapPinMain.style.left = X_MIN_COORD + 'px';
+    } if (mapPinMain.offsetLeft > X_MAX_COORD) {
+      mapPinMain.style.left = X_MAX_COORD + 'px';
+    } else {
+      mapPinMain.style.top = (mapPinMain.offsetTop - shift.y) + 'px';
+      mapPinMain.style.left = (mapPinMain.offsetLeft - shift.x) + 'px';
+    }
+  };
+
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+    enabledMap();
+
+    getInitialMainPinCoords();
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
+
 
 // Активация формы для подачи объявления
 var enabledForm = function () {
@@ -147,12 +206,11 @@ var enabledMap = function () {
   map.classList.remove('map--faded');
   enabledForm();
   addEventToPin(enabledPins());
-  getInitialMainPinCoords();
 };
 
-mapPinMain.addEventListener('mouseup', function () {
-  enabledMap();
-});
+// mapPinMain.addEventListener('mouseup', function () {
+//   enabledMap();
+// });
 
 // Генерация списка авторов объявлений
 var getAutorList = function (AuthorNumber) {
@@ -204,7 +262,7 @@ var createOfferDataList = function (offerAuthor, offerContent) {
         y: getRandomValue(Y_MAX_COORD, Y_MIN_COORD)
       },
     };
-    offer.offer.address = offer.location.x + ',' + ' ' + (offer.location.y - (PIN_TAIL + PIN_HEIGHT / 2));
+    offer.offer.address = offer.location.x + ',' + ' ' + (offer.location.y + (PIN_TAIL + PIN_HEIGHT / 2));
     offersList.push(offer);
   }
   return offersList;
@@ -326,12 +384,16 @@ var addPinClickHendler = function (pin, offer) {
   });
 };
 
+var addPinCloseClickHendler = function (pin) {
+  pin.addEventListener('click', function () {
+    closePopup();
+  });
+};
+
 
 var addEventToPin = function (pins) {
   for (var i = 0; i < offers.length; i++) {
-    pins[i + 1].addEventListener('click', function () {
-      closePopup();
-    });
+    addPinCloseClickHendler(pins[i + 1]);
     addPinClickHendler(pins[i + 1], offers[i]);
   }
 };
@@ -351,7 +413,7 @@ var roomNumberTip = noticeForm.querySelector('.room_number_tip');
 var capacity = noticeForm.querySelector('#capacity');
 var reset = noticeForm.querySelector('.form__reset');
 
-// Функция синхронизации двух селектов
+// Функция синхронизации двух похожих(по длине) селектов
 var synchTime = function (selectOne, selectTwo) {
   selectOne.value = selectTwo.value;
 };
