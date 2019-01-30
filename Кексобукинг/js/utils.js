@@ -2,6 +2,7 @@
 
 // Вспомогательные функции
 (function () {
+  var ESC_KEYCODE = 27;
 
 window.utils = {
     // Функия получения случайного значения
@@ -13,14 +14,14 @@ window.utils = {
       }
     },
     // Функция случайной сортировки массива из другова массива
-    'getRandomArray': function (someArray) {
-      for (var i = someArray.length - 1; i > 0; i--) {
+    'getRandomArray': function (sourceArray) {
+      for (var i = sourceArray.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
-        var tempValue = someArray[i];
-        someArray[i] = someArray[j];
-        someArray[j] = tempValue;
+        var tempValue = sourceArray[i];
+        sourceArray[i] = sourceArray[j];
+        sourceArray[j] = tempValue;
       }
-      return someArray;
+      return sourceArray;
     },
     // Функция  получения массива с произвльной длиной
     'getRandomArrayLength': function (someArray) {
@@ -41,8 +42,11 @@ window.utils = {
     // Получение половины значения
     'getHalf': function (value) {
       return value / 2;
+    },
+    'isEscPressEvent': function (escEvt, action) {
+      if (escEvt.keyCode === ESC_KEYCODE) {
+        action();
+      }
     }
   };
-
-
 })();

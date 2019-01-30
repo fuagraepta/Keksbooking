@@ -3,7 +3,9 @@
 (function () {
   // Заполнение и валидация формы отправки объяления
   var noticeForm = document.querySelector('.notice__form');
-  var allNoticeFormInputs = noticeForm.querySelectorAll('.input');
+  var allNoticeFormFieldset = noticeForm.querySelectorAll('fieldset');
+  var allNoticeFormInputs = noticeForm.querySelectorAll('input');
+  var inputAddress = noticeForm.querySelector('#address');
   var selectType = noticeForm.querySelector('#type');
   var price = noticeForm.querySelector('#price');
   var timein = noticeForm.querySelector('#timein');
@@ -14,28 +16,39 @@
   var reset = noticeForm.querySelector('.form__reset');
 
   window.form = {
-    // Деактивация формы для подачи объявления
-    'disabledForm': function () {
-      noticeForm.classList.add('notice__form--disabled');
-      for (var i = 0; i < allNoticeFormInputs.length; i++) {
-        allNoticeFormInputs[i].disabled = true;
-      }
-    },
     // Активация формы для подачи объявления
     'enabledForm': function () {
       noticeForm.classList.remove('notice__form--disabled');
-      for (var i = 0; i < allNoticeFormInputs.length; i++) {
-        allNoticeFormInputs[i].disabled = false;
+      for (var i = 0; i < allNoticeFormFieldset.length; i++) {
+        allNoticeFormFieldset[i].disabled = false;
       }
     },
     // Получение  начального адреса основной метки
     'getMainPinAdress': function () {
-      var inputAddress = noticeForm.querySelector('#address');
-      inputAddress.value = window.map.mapPinMain.offsetLeft + ', ' + (window.map.mapPinMain.offsetTop + window.utils.getHalf(window.map.MAIN_PIN_HEIGHT) + window.map.MAIN_PIN_TAIL);
+      inputAddress.value = window.map.getMainPinCoord();
     }
   };
 
-  window.form.disabledForm();
+  // Сброс содердимого формы для Google Chrome (не отрабатывает input type = reset)
+  var setInputValueDefault = function () {
+    var textArea = noticeForm.querySelector('textarea');
+    textArea.value = '';
+    for (var i = 0; i < allNoticeFormInputs.length; i++) {
+      allNoticeFormInputs[i].value = '';
+      allNoticeFormInputs[i].checked = false;
+    }
+  };
+
+  // Деактивация формы для подачи объявления
+  var disabledForm = function () {
+    noticeForm.classList.add('notice__form--disabled');
+    for (var i = 0; i < allNoticeFormFieldset.length; i++) {
+      allNoticeFormFieldset[i].disabled = true;
+    }
+  };
+
+
+  disabledForm();
 
   // Функция синхронизации двух похожих(по длине) селектов
   var synchTime = function (selectOne, selectTwo) {
@@ -43,10 +56,10 @@
   };
 
   // Вывод подсказки для не валидных полей
-  var addTip = function (invalidElement, tip, tipMessage) {
+  var addTip = function (invalidElement, errorTip, tipMessage) {
     if (invalidElement.setCustomValidity !== '') {
-      tip.classList.remove('hidden');
-      tip.textContent = tipMessage;
+      errorTip.classList.remove('hidden');
+      errorTip.textContent = tipMessage;
     }
   };
 
@@ -55,7 +68,7 @@
     tip.classList.add('hidden');
   };
 
-  //  Размещение делегирование формы отправки на не валидные поля.
+  //  Размещение делегирование на форму. При отправке подсвечивает невалидные поля.
   noticeForm.addEventListener('invalid', function (evt) {
     var target = evt.target;
     if (target.validity.valid === false) {
@@ -144,8 +157,9 @@
   reset.addEventListener('click', function () {
     removeTip(roomNumberTip);
     removeTip(titleTip);
-    // closePopup();
-    window.form.disabledForm();
+    disabledForm();
+    setInputValueDefault();
     window.map.disabledMap();
   });
+
 })();
