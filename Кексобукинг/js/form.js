@@ -45,8 +45,8 @@
     for (var i = 0; i < allNoticeFormFieldset.length; i++) {
       allNoticeFormFieldset[i].disabled = true;
     }
+    // setInputValueDefault();
   };
-
 
   disabledForm();
 
@@ -154,12 +154,15 @@
   });
 
   // Сброс страницы в исходное состояние.
-  reset.addEventListener('click', function () {
+  var setDefaultSetup = function () {
     removeTip(roomNumberTip);
     removeTip(titleTip);
     disabledForm();
     setInputValueDefault();
     window.map.disabledMap();
-  });
+  };
 
+  reset.addEventListener('click', function () {
+    setDefaultSetup();
+  });
 })();

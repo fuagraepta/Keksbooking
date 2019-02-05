@@ -12,24 +12,25 @@
   var Y_MIN_COORD = 130;
 
 window.map = {
-  // Получение кординат основной метки
+  // Получение координат основной метки
     'getMainPinCoord': function () {
       return mapPinMain.offsetLeft + ', ' + (mapPinMain.offsetTop + window.utils.getHalf(MAIN_PIN_HEIGHT) + MAIN_PIN_TAIL);
     },
     // Деактивация карты
     'disabledMap': function () {
       cityMap.classList.add('map--faded');
-      disabledPins(offerPins);
+      disabledPins(getPins());
       setMainPinCoordsDefault();
       closePopup();
     }
   };
 
   // Активация карты и формы для подачи объявления
-var enabledMap = function () {
+  var enabledMap = function () {
     cityMap.classList.remove('map--faded');
     window.form.enabledForm();
-    addEventToPin(enabledPins(offerPins));
+    addEventToPin(enabledPins(getPins()));
+    getPins();
   };
 
   // Взаимодействие с метками объявления
@@ -44,8 +45,13 @@ var enabledMap = function () {
     }
   };
 
-  addOfferMark(window.data);
-  var offerPins = cityMap.querySelectorAll('.map__pin');
+  window.backend.loadData(addOfferMark);
+
+  // Получение Элементов метки после активации карты
+  var getPins = function () {
+    var offerPins = cityMap.querySelectorAll('.map__pin');
+    return offerPins;
+  };
 
   // Активация меток на карте
   var enabledPins = function (noActivPin) {
@@ -55,26 +61,26 @@ var enabledMap = function () {
     return noActivPin;
   };
 
-  // Деакттвация меток на карте
+  // Деактивация меток на карте
   var disabledPins = function (activPin) {
     for (var i = 1; i < activPin.length; i++) {
       activPin[i].classList.add('hidden');
     }
   };
 
-  // Маркировка выбраной на карте отметки
+  // Маркировка выбранной на карте метки
   var markPin = function (unmarkPin) {
     unmarkPin.classList.add('map__pin--active');
   };
 
-  // Снятие маркировки с отметки
+  // Снятие маркировки с метки
   var unmarkPin = function (markPins) {
     for (var i = 1; i < markPins.length; i++) {
       markPins[i].classList.remove('map__pin--active');
     }
   };
 
-  // Сброс кординат основной метки по умолчанию
+  // Сброс координат основной метки по умолчанию
   var setMainPinCoordsDefault = function () {
     mapPinMain.style.left = window.utils.getHalf(MAP_WIDTH) + 'px';
     mapPinMain.style.top = window.utils.getHalf(MAP_HEIGHT) + 'px';
@@ -102,7 +108,7 @@ var enabledMap = function () {
     if (cityMap.querySelector('.popup')) {
       var popup = cityMap.querySelector('.popup');
       cityMap.removeChild(popup);
-      unmarkPin(offerPins);
+      unmarkPin(getPins());
     }
     document.removeEventListener('keydown', onPopupPressEsc);
   };
@@ -120,7 +126,7 @@ var enabledMap = function () {
     });
   };
 
-// Добавление обработчиков событий для закрытия объявления по щелчку на другую метку
+  // Добавление обработчиков событий для закрытия объявления по щелчку на другую метку
   var addOnPinClickClose = function (mark) {
     mark.addEventListener('click', function () {
       closePopup();
@@ -182,6 +188,4 @@ var enabledMap = function () {
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
-
-  window.map.disabledMap();
 })();
