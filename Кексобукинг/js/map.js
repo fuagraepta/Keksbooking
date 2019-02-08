@@ -29,8 +29,8 @@ window.map = {
   var enabledMap = function () {
     cityMap.classList.remove('map--faded');
     window.form.enabledForm();
-    addEventToPin(enabledPins(getPins()));
-    getPins();
+    enabledPins(getPins());
+    window.backend.loadData(onSuccess, window.utils.onError);
   };
 
   // Взаимодействие с метками объявления
@@ -45,7 +45,7 @@ window.map = {
     }
   };
 
-  window.backend.loadData(addOfferMark);
+  window.backend.loadData(addOfferMark, window.utils.onError);
 
   // Получение Элементов метки после активации карты
   var getPins = function () {
@@ -95,6 +95,15 @@ window.map = {
     cityMap.insertBefore(fragment, mapFilters);
   };
 
+  // При успешной загрузки данных с сервера, привязывает метки к карточкам (данные карт получаем с сервера)
+  var onSuccess = function (offersCard) {
+    var pins = getPins();
+    for (var i = 0; i < offersCard.length; i++) {
+      addOnPinClickClose(pins[i + 1]);
+      addOnPinClickOpen(pins[i + 1], offersCard[i]);
+    }
+  };
+
   // Открыть попап с объявлением
   var openPopup = function (popupOffer) {
     addAdvertising(popupOffer);
@@ -120,23 +129,20 @@ window.map = {
 
   // Добавление обработчиков событий для открытия объявления по щелчку на каждую метку
   var addOnPinClickOpen = function (pin, offer) {
-    pin.addEventListener('click', function () {
-      openPopup(offer);
-      markPin(pin);
-    });
+    if (pin) {
+      pin.addEventListener('click', function () {
+        openPopup(offer);
+        markPin(pin);
+      });
+    }
   };
 
   // Добавление обработчиков событий для закрытия объявления по щелчку на другую метку
   var addOnPinClickClose = function (mark) {
-    mark.addEventListener('click', function () {
-      closePopup();
-    });
-  };
-
-  var addEventToPin = function (pins) {
-    for (var i = 0; i < window.data.length; i++) {
-      addOnPinClickClose(pins[i + 1]);
-      addOnPinClickOpen(pins[i + 1], window.data[i]);
+    if (mark) {
+      mark.addEventListener('click', function () {
+        closePopup();
+      });
     }
   };
 
