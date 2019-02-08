@@ -29,7 +29,7 @@
     }
   };
 
-  // Сброс содердимого формы для Google Chrome (не отрабатывает input type = reset)
+  // Сброс содержимого формы для Google Chrome (не отрабатывает input type = reset)
   var setInputValueDefault = function () {
     var textArea = noticeForm.querySelector('textarea');
     textArea.value = '';
@@ -45,7 +45,6 @@
     for (var i = 0; i < allNoticeFormFieldset.length; i++) {
       allNoticeFormFieldset[i].disabled = true;
     }
-    // setInputValueDefault();
   };
 
   disabledForm();
@@ -55,7 +54,7 @@
     selectOne.value = selectTwo.value;
   };
 
-  // Вывод подсказки для не валидных полей
+  // Вывод подсказки для не корректно заполненных полей
   var addTip = function (invalidElement, errorTip, tipMessage) {
     if (invalidElement.setCustomValidity !== '') {
       errorTip.classList.remove('hidden');
@@ -63,12 +62,12 @@
     }
   };
 
-  // Скрыть подсказку для валидных полей
+  // Скрыть подсказку для корректно заполненных полей
   var removeTip = function (tip) {
     tip.classList.add('hidden');
   };
 
-  //  Размещение делегирование на форму. При отправке подсвечивает невалидные поля.
+  //  Размещение делегирование на форму. При отправке подсвечивает не корректно заполненные поля.
   noticeForm.addEventListener('invalid', function (evt) {
     var target = evt.target;
     if (target.validity.valid === false) {
@@ -76,7 +75,7 @@
     }
   }, true);
 
-  // Показывает сообщение для описания в случаи не валидности поля
+  // Показывает сообщение для описания, в случаи не корректно заполненного поля
   // При желании можно отключить
   var title = noticeForm.querySelector('#title');
   var titleTip = noticeForm.querySelector('.title_tip');
@@ -151,6 +150,43 @@
 
   capacity.addEventListener('input', function () {
     sinchRoomAndCapacity();
+  });
+
+  // Popup успешной отправки данных на сервер
+  var successPopup = document.querySelector('.popup__success');
+
+  // Закрыть popup
+  var closeSuccessPopup = function () {
+    successPopup.classList.add('hidden');
+    setDefaultSetup();
+    document.removeEventListener('keydown', onSuccessPopupPressEsc)
+    document.removeEventListener('click', onDocumentClick);
+  };
+
+  // Открыть popup
+  var openSuccessPopup = function () {
+    successPopup.tabIndex = 10;
+    successPopup.classList.remove('hidden');
+    document.addEventListener('keydown', onSuccessPopupPressEsc);
+    document.addEventListener('click', onDocumentClick);
+  };
+
+  // Закрыть popup по нажатию на ESC
+  var onSuccessPopupPressEsc = function (escEvt) {
+    window.utils.isEscPressEvent(escEvt, closeSuccessPopup);
+  };
+
+  // Закрыть popup по нажатию  на любую область документа
+  var onDocumentClick = function () {
+    closeSuccessPopup();
+  };
+
+  // Отправка данных на сервер без перезагрузки страницы
+  noticeForm.addEventListener('submit', function (evt) {
+    window.backend.saveData(new FormData(noticeForm), function () {
+      openSuccessPopup();
+    }, window.utils.onError);
+    evt.preventDefault();
   });
 
   // Сброс страницы в исходное состояние.

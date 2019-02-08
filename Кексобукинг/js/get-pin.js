@@ -1,11 +1,12 @@
 'use strict';
 
 (function () {
+  // Разметка метки объявления
+
   var mapPinTemplate = document.querySelector('template')
   .content.querySelector('.map__pin');
   var PIN_TAIL = 40;
 
-  // Разметка метки объявления
   window.getPin = function (offerMark) {
     var pin = mapPinTemplate.cloneNode(true);
     pin.classList.add('hidden');

@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  // Отрисовка  карточки объявления
+  // Разметка карточки объявления
   var mapCardTemplate = document.querySelector('template')
   .content.querySelector('.map__card');
 
@@ -13,15 +13,14 @@
     'bungalo': 'Бунгало'
   };
 
-  // Разметка карточки объявления
   window.getCard = function (advertising) {
     var popup = mapCardTemplate.cloneNode(true);
     var popupAvatar = window.utils.getDefiniteElement(popup, '.popup__avatar'); // Аватарка
     popupAvatar.src = advertising.author.avatar;
-    var popupFeatures = popup.querySelectorAll('.feature'); // Преимушества
+    var popupFeatures = popup.querySelectorAll('.feature'); // Преимущества
 
     for (var i = 0; i < popupFeatures.length; i++) {
-      if (i >= advertising.offer.feature.length) {
+      if (i >= advertising.offer.features.length) {
         popupFeatures[i].classList.remove('feature');
       }
     }
@@ -37,7 +36,7 @@
     }
 
     window.utils.getDefiniteElement(popup, '.popup__title', advertising.offer.title); // Заголовок объявления
-    window.utils.getDefiniteElement(popup, '.popup__text--address', advertising.offer.address); // Адресс объявления
+    window.utils.getDefiniteElement(popup, '.popup__text--address', advertising.offer.address); // Адрес объявления
     window.utils.getDefiniteElement(popup, '.popup__text--price', advertising.offer.price + ' ₽/Ночь'); // Цена
     window.utils.getDefiniteElement(popup, '.popup__type', OFFER_TYPE_RU[advertising.offer.type]); // Тип жилья
     window.utils.getDefiniteElement(popup, '.popup__text--capacity', advertising.offer.rooms + ' комнаты для ' + advertising.offer.guests + ' гостей'); // Количество гостей + количество комнат
