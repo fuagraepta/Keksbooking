@@ -3,8 +3,9 @@
 // Вспомогательные функции
 (function () {
   var ESC_KEYCODE = 27;
+  var DEBOUNCE_INTERVAL = 50;
 
-window.utils = {
+var utils = {
     // Функия получения случайного значения
     'getRandomValue': function (max, min) {
       if (min) {
@@ -59,6 +60,20 @@ window.utils = {
       window.setTimeout(function () {
         errorPopup.classList.add('hidden')
       }, 10000);
+    },
+    'debounce': function (cb) {
+      var lastTimeout = null;
+
+      return function () {
+        var parameters = arguments;
+        if (lastTimeout) {
+          window.clearTimeout(lastTimeout);
+        }
+        lastTimeout = window.setTimeout(function () {
+          cb.apply(null, parameters);
+        }, DEBOUNCE_INTERVAL);
+      };
     }
   };
+  window.utils = utils;
 })();

@@ -1,7 +1,5 @@
 'use strict';
 (function () {
-  var cityMap = document.querySelector('.map');
-  var mapPinMain = cityMap.querySelector('.map__pin--main');
   var MAP_WIDTH = 1200;
   var MAP_HEIGHT = 750;
   var MAIN_PIN_TAIL = 20;
@@ -11,61 +9,44 @@
   var Y_MAX_COORD = 660;
   var Y_MIN_COORD = 130;
 
-window.map = {
-  // Получение координат основной метки
+  var map = {
+    'cityMap': document.querySelector('.map'),
+    // Получение координат основной метки
     'getMainPinCoord': function () {
       return mapPinMain.offsetLeft + ', ' + (mapPinMain.offsetTop + window.utils.getHalf(MAIN_PIN_HEIGHT) + MAIN_PIN_TAIL);
     },
     // Деактивация карты
     'disabledMap': function () {
-      cityMap.classList.add('map--faded');
-      disabledPins(getPins());
+      map.cityMap.classList.add('map--faded');
+      disabledFilters();
       setMainPinCoordsDefault();
-      closePopup();
+      window.pin.removePin();
+      window.card.closePopup();
+    },
+    // Синхронизация меток с карточками
+    'synhPinAndCards': function (offersCard) {
+      var pins = getPins();
+      for (var i = 0; i < offersCard.length; i++) {
+        addOnPinClickClose(pins[i + 1]);
+        addOnPinClickOpen(pins[i + 1], offersCard[i]);
+      }
     }
   };
+
+  var mapPinMain = map.cityMap.querySelector('.map__pin--main');
 
   // Активация карты и формы для подачи объявления
   var enabledMap = function () {
-    cityMap.classList.remove('map--faded');
+    map.cityMap.classList.remove('map--faded');
+    enabledFilters();
     window.form.enabledForm();
-    enabledPins(getPins());
-    window.backend.loadData(onSuccess, window.utils.onError);
+    window.filterPins();
   };
-
-  // Взаимодействие с метками объявления
-  // Добавление метки объявления на карту
-  var addOfferMark = function (offerPin) {
-    var mapPins = cityMap.querySelector('.map__pins');
-    var fragment = document.createDocumentFragment();
-
-    for (var i = 0; i < offerPin.length; i++) {
-      fragment.appendChild(window.getPin(offerPin[i]));
-      mapPins.appendChild(fragment);
-    }
-  };
-
-  window.backend.loadData(addOfferMark, window.utils.onError);
 
   // Получение Элементов метки после активации карты
   var getPins = function () {
-    var offerPins = cityMap.querySelectorAll('.map__pin');
+    var offerPins = map.cityMap.querySelectorAll('.map__pin');
     return offerPins;
-  };
-
-  // Активация меток на карте
-  var enabledPins = function (noActivPin) {
-    for (var i = 1; i < noActivPin.length; i++) {
-      noActivPin[i].classList.remove('hidden');
-    }
-    return noActivPin;
-  };
-
-  // Деактивация меток на карте
-  var disabledPins = function (activPin) {
-    for (var i = 1; i < activPin.length; i++) {
-      activPin[i].classList.add('hidden');
-    }
   };
 
   // Маркировка выбранной на карте метки
@@ -86,52 +67,25 @@ window.map = {
     mapPinMain.style.top = window.utils.getHalf(MAP_HEIGHT) + 'px';
   };
 
-  // Взаимодействие с карточками объявления
-  // Добавление объявления в DOM
-  var addAdvertising = function (element) {
-    var mapFilters = cityMap.querySelector('.map__filters-container');
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(window.getCard(element));
-    cityMap.insertBefore(fragment, mapFilters);
+  var mapFilter = map.cityMap.querySelector('.map__filters-container');
+
+  // Блокировка фильтра
+  var disabledFilters = function () {
+    mapFilter.classList.add('hidden');
   };
 
-  // При успешной загрузки данных с сервера, привязывает метки к карточкам (данные карт получаем с сервера)
-  var onSuccess = function (offersCard) {
-    var pins = getPins();
-    for (var i = 0; i < offersCard.length; i++) {
-      addOnPinClickClose(pins[i + 1]);
-      addOnPinClickOpen(pins[i + 1], offersCard[i]);
-    }
+  disabledFilters();
+
+  // Активация фильта
+  var enabledFilters = function () {
+    mapFilter.classList.remove('hidden');
   };
 
-  // Открыть попап с объявлением
-  var openPopup = function (popupOffer) {
-    addAdvertising(popupOffer);
-    document.addEventListener('keydown', onPopupPressEsc);
-    var popupClose = cityMap.querySelector('.popup__close');
-    popupClose.addEventListener('click', closePopup);
-  };
-
-  // Закрыть попап с объявлением
-  var closePopup = function () {
-    if (cityMap.querySelector('.popup')) {
-      var popup = cityMap.querySelector('.popup');
-      cityMap.removeChild(popup);
-      unmarkPin(getPins());
-    }
-    document.removeEventListener('keydown', onPopupPressEsc);
-  };
-
-  // Закрытие попап по нажатию на ESC
-  var onPopupPressEsc = function (escEvent) {
-    window.utils.isEscPressEvent(escEvent, closePopup);
-  };
-
-  // Добавление обработчиков событий для открытия объявления по щелчку на каждую метку
+  // Добавление обработчиков событий для открытия объявления по щелчку на метку
   var addOnPinClickOpen = function (pin, offer) {
     if (pin) {
       pin.addEventListener('click', function () {
-        openPopup(offer);
+        window.card.openPopup(offer);
         markPin(pin);
       });
     }
@@ -141,7 +95,8 @@ window.map = {
   var addOnPinClickClose = function (mark) {
     if (mark) {
       mark.addEventListener('click', function () {
-        closePopup();
+        window.card.closePopup();
+        unmarkPin(getPins());
       });
     }
   };
@@ -184,9 +139,7 @@ window.map = {
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
       enabledMap();
-
       window.form.getMainPinAdress();
-
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     };
@@ -194,4 +147,5 @@ window.map = {
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
+  window.map = map;
 })();
