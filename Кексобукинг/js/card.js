@@ -6,7 +6,7 @@
   .content.querySelector('.map__card');
 
   // Перевод типов жилья на русский
-  var engToRus = {
+  var engTypeToRusType = {
     'palace': 'Дворец',
     'flat': 'Квартира',
     'house': 'Дом',
@@ -38,7 +38,7 @@
     window.utils.getDefiniteElement(popup, '.popup__title', advertising.offer.title); // Заголовок объявления
     window.utils.getDefiniteElement(popup, '.popup__text--address', advertising.offer.address); // Адрес объявления
     window.utils.getDefiniteElement(popup, '.popup__text--price', advertising.offer.price + ' ₽/Ночь'); // Цена
-    window.utils.getDefiniteElement(popup, '.popup__type', engToRus[advertising.offer.type]); // Тип жилья
+    window.utils.getDefiniteElement(popup, '.popup__type', engTypeToRusType[advertising.offer.type]); // Тип жилья
     window.utils.getDefiniteElement(popup, '.popup__text--capacity', advertising.offer.rooms + ' комнаты для ' + advertising.offer.guests + ' гостей'); // Количество гостей + количество комнат
     window.utils.getDefiniteElement(popup, '.popup__text--time', 'Заезд после ' + advertising.offer.checkin + ', выезд до ' + advertising.offer.checkout); // Время заезда + время выезда.
     window.utils.getDefiniteElement(popup, '.popup__description', advertising.offer.description); // Описание
@@ -47,6 +47,7 @@
   };
 
   var card = {
+    // Добавление объявления в DOM
     'renderCard': function (element) {
       var mapFilters = window.map.cityMap.querySelector('.map__filters-container');
       var fragment = document.createDocumentFragment();
@@ -55,10 +56,10 @@
     },
     // Открыть попап с объявлением
     'openPopup': function (popupOffer) {
-      card.renderCard(popupOffer);
+      this.renderCard(popupOffer);
       document.addEventListener('keydown', onPopupPressEsc);
       var popupClose = window.map.cityMap.querySelector('.popup__close');
-      popupClose.addEventListener('click', card.closePopup);
+      popupClose.addEventListener('click', this.closePopup);
     },
     // Закрыть попап с объявлением
     'closePopup': function () {

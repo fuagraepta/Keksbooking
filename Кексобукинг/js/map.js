@@ -1,19 +1,21 @@
 'use strict';
 (function () {
-  var MAP_WIDTH = 1200;
-  var MAP_HEIGHT = 750;
-  var MAIN_PIN_TAIL = 20;
-  var MAIN_PIN_HEIGHT = 60;
-  var X_MAX_COORD = 1170;
-  var X_MIN_COORD = 30;
-  var Y_MAX_COORD = 660;
-  var Y_MIN_COORD = 130;
+  var MapSetting = {
+    'WIDTH': 1200,
+    'HEIGHT': 750,
+    'MAIN_PIN_TAIL': 20,
+    'MAIN_PIN_HEIGHT': 60,
+    'X_MAX_COORD': 1170,
+    'X_MIN_COORD': 30,
+    'Y_MAX_COORD': 660,
+    'Y_MIN_COORD': 130
+  };
 
   var map = {
     'cityMap': document.querySelector('.map'),
     // Получение координат основной метки
     'getMainPinCoord': function () {
-      return mapPinMain.offsetLeft + ', ' + (mapPinMain.offsetTop + window.utils.getHalf(MAIN_PIN_HEIGHT) + MAIN_PIN_TAIL);
+      return mapPinMain.offsetLeft + ', ' + (mapPinMain.offsetTop + window.utils.getHalf(MapSetting.MAIN_PIN_HEIGHT) + MapSetting.MAIN_PIN_TAIL);
     },
     // Деактивация карты
     'disabledMap': function () {
@@ -63,8 +65,8 @@
 
   // Сброс координат основной метки по умолчанию
   var setMainPinCoordsDefault = function () {
-    mapPinMain.style.left = window.utils.getHalf(MAP_WIDTH) + 'px';
-    mapPinMain.style.top = window.utils.getHalf(MAP_HEIGHT) + 'px';
+    mapPinMain.style.left = window.utils.getHalf(MapSetting.WIDTH) + 'px';
+    mapPinMain.style.top = window.utils.getHalf(MapSetting.HEIGHT) + 'px';
   };
 
   var mapFilter = map.cityMap.querySelector('.map__filters-container');
@@ -122,14 +124,14 @@
         y: moveEvt.clientY
       };
 
-      if (mapPinMain.offsetTop < Y_MIN_COORD) {
-        mapPinMain.style.top = Y_MIN_COORD + 'px';
-      } if (mapPinMain.offsetTop > Y_MAX_COORD) {
-        mapPinMain.style.top = Y_MAX_COORD + 'px';
-      } if (mapPinMain.offsetLeft < X_MIN_COORD) {
-        mapPinMain.style.left = X_MIN_COORD + 'px';
-      } if (mapPinMain.offsetLeft > X_MAX_COORD) {
-        mapPinMain.style.left = X_MAX_COORD + 'px';
+      if (mapPinMain.offsetTop < MapSetting.Y_MIN_COORD) {
+        mapPinMain.style.top = MapSetting.Y_MIN_COORD + 'px';
+      } if (mapPinMain.offsetTop > MapSetting.Y_MAX_COORD) {
+        mapPinMain.style.top = MapSetting.Y_MAX_COORD + 'px';
+      } if (mapPinMain.offsetLeft < MapSetting.X_MIN_COORD) {
+        mapPinMain.style.left = MapSetting.X_MIN_COORD + 'px';
+      } if (mapPinMain.offsetLeft > MapSetting.X_MAX_COORD) {
+        mapPinMain.style.left = MapSetting.X_MAX_COORD + 'px';
       } else {
         mapPinMain.style.top = (mapPinMain.offsetTop - shift.y) + 'px';
         mapPinMain.style.left = (mapPinMain.offsetLeft - shift.x) + 'px';

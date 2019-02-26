@@ -6,21 +6,14 @@
   var allNoticeFormFieldset = noticeForm.querySelectorAll('fieldset');
   var allNoticeFormInputs = noticeForm.querySelectorAll('input');
   var inputAddress = noticeForm.querySelector('#address');
-  var selectType = noticeForm.querySelector('#type');
-  var price = noticeForm.querySelector('#price');
-  var timein = noticeForm.querySelector('#timein');
-  var timeout = noticeForm.querySelector('#timeout');
-  var roomNumber = noticeForm.querySelector('#room_number');
-  var capacity = noticeForm.querySelector('#capacity');
-  var reset = noticeForm.querySelector('.form__reset');
 
-  window.form = {
+  var form = {
     // Активация формы для подачи объявления
     'enabledForm': function () {
       noticeForm.classList.remove('notice__form--disabled');
-      for (var i = 0; i < allNoticeFormFieldset.length; i++) {
-        allNoticeFormFieldset[i].disabled = false;
-      }
+      allNoticeFormFieldset.forEach(function (input) {
+        input.disabled = false;
+      });
     },
     // Получение  начального адреса основной метки
     'getMainPinAdress': function () {
@@ -32,18 +25,18 @@
   var setInputValueDefault = function () {
     var textArea = noticeForm.querySelector('textarea');
     textArea.value = '';
-    for (var i = 0; i < allNoticeFormInputs.length; i++) {
-      allNoticeFormInputs[i].value = '';
-      allNoticeFormInputs[i].checked = false;
-    }
+    allNoticeFormInputs.forEach(function (input) {
+      input.value = '';
+      input.checked = false;
+    });
   };
 
   // Деактивация формы для подачи объявления
   var disabledForm = function () {
     noticeForm.classList.add('notice__form--disabled');
-    for (var i = 0; i < allNoticeFormFieldset.length; i++) {
-      allNoticeFormFieldset[i].disabled = true;
-    }
+    allNoticeFormFieldset.forEach(function (activeInput) {
+      activeInput.disabled = true;
+    });
   };
 
   disabledForm();
@@ -57,19 +50,17 @@
   }, true);
 
   // При выборе типа жилья меняется минимальная стоимость
+  var selectType = noticeForm.querySelector('#type');
+  var price = noticeForm.querySelector('#price');
+  var typeToMinPrice = {
+    'bungalo': 0,
+    'flat': 1000,
+    'house': 5000,
+    'palace': 10000
+  };
+
   selectType.addEventListener('input', function () {
-    if (selectType.value === 'flat') {
-      price.min = 1000;
-    }
-    if (selectType.value === 'bungalo') {
-      price.min = 0;
-    }
-    if (selectType.value === 'house') {
-      price.min = 5000;
-    }
-    if (selectType.value === 'palace') {
-      price.min = 10000;
-    }
+    price.min = typeToMinPrice[selectType.value];
     price.placeholder = price.min;
   });
 
@@ -79,6 +70,9 @@
   };
 
   // Время заезда синхронизируется со временем выезда
+  var timein = noticeForm.querySelector('#timein');
+  var timeout = noticeForm.querySelector('#timeout');
+
   timein.addEventListener('change', function () {
     synchTime(timeout, timein);
   });
@@ -87,6 +81,9 @@
   });
 
   // Синхронизация комнат с количеством гостей
+  var roomNumber = noticeForm.querySelector('#room_number');
+  var capacity = noticeForm.querySelector('#capacity');
+
   var sinchRoomAndCapacity = function () {
     if (roomNumber.value === '1' && capacity.value !== '1') {
       roomNumber.setCustomValidity('для 1 гостя');
@@ -148,6 +145,8 @@
   });
 
   // Сброс страницы в исходное состояние.
+  var reset = noticeForm.querySelector('.form__reset');
+
   var setDefaultSetup = function () {
     disabledForm();
     setInputValueDefault();
@@ -157,4 +156,5 @@
   reset.addEventListener('click', function () {
     setDefaultSetup();
   });
+  window.form = form;
 })();

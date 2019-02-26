@@ -1,14 +1,13 @@
 'use strict';
 
 (function () {
-
+  // Разметка метки объявления
   var mapPins = document.querySelector('.map__pins');
   var mapPinTemplate = document.querySelector('template')
   .content.querySelector('.map__pin');
   var PIN_TAIL = 40;
   var PIN_NUMBER = 5;
 
-  // Разметка метки объявления
   var getPin = function (offerMark) {
     var pin = mapPinTemplate.cloneNode(true);
     pin.style = 'left:' + offerMark.location.x + 'px;' + 'top:' +
@@ -18,8 +17,8 @@
     return pin;
   };
 
-  // Добавление метки объявления на карту
-  window.pin = {
+  var pin = {
+    // Добавление метки объявления на карту
     'addPin': function (offerPin) {
       var pinNumber = offerPin.length > PIN_NUMBER ? PIN_NUMBER : offerPin.length;
       var fragment = document.createDocumentFragment();
@@ -28,6 +27,7 @@
         mapPins.appendChild(fragment);
       }
     },
+    // Удаление метки объявления с карты
     'removePin': function () {
       var pins = mapPins.querySelectorAll('.map__pin');
       for (var i = 1; i < pins.length; i++) {
@@ -35,4 +35,5 @@
       }
     }
   };
+  window.pin = pin;
 })();

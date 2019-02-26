@@ -3,7 +3,7 @@
 (function () {
   var typeFilter = document.querySelector('#housing-type');
   var priceFilter = document.querySelector('#housing-price');
-  var roomsFilter = document.querySelector('#housing-rooms');
+  var roomFilter = document.querySelector('#housing-rooms');
   var guestFilter = document.querySelector('#housing-guests');
   var featuresFilter = document.querySelector('.features');
 
@@ -11,6 +11,16 @@
   var LIMIT_PRICE = {
     min: 10000,
     middle: 50000
+  };
+
+  // Получение данных объявления
+  var advertisingStore = [];
+
+  var getAdvertisin = function () {
+    if (window.advertisingData) {
+      advertisingStore = window.advertisingData;
+    }
+    return advertisingStore;
   };
 
   window.filterPins = function () {
@@ -36,15 +46,15 @@
 
     // Фильтр по количеству комнат
     var checkRoomNumber = function (advertising) {
-      return (+roomsFilter.value === advertising.offer.rooms) || (roomsFilter.value === ANY_VALUE);
+      return (+roomFilter.value === advertising.offer.rooms) || (roomFilter.value === ANY_VALUE);
     };
 
-    // Фильтр по колчеству гостей
+    // Фильтр по количеству гостей
     var checkGuestNumber = function (advertising) {
       return (+guestFilter.value === advertising.offer.guests) || (guestFilter.value === ANY_VALUE);
     };
 
-    // Фильтр преимушеств
+    // Фильтр преимуществ
     var checkFeatures = function (advertising) {
       var checkedFeatures = Array.from(featuresFilter.querySelectorAll('input[type=checkbox]:checked'));
       var selectedFeatures = checkedFeatures.map(function (item) {
@@ -56,7 +66,7 @@
     };
 
     // Фильтр всех свойств
-    var allFilteredPins = window.advertisingData.filter(checkType).filter(checkPrice).filter(checkRoomNumber).filter(checkGuestNumber).filter(checkFeatures);
+    var allFilteredPins = getAdvertisin().filter(checkType).filter(checkPrice).filter(checkRoomNumber).filter(checkGuestNumber).filter(checkFeatures);
     window.card.closePopup();
     window.pin.removePin();
     window.pin.addPin(allFilteredPins);
@@ -67,8 +77,7 @@
 
   typeFilter.addEventListener('change', onFilterChange);
   priceFilter.addEventListener('change', onFilterChange);
-  roomsFilter.addEventListener('change', onFilterChange);
+  roomFilter.addEventListener('change', onFilterChange);
   guestFilter.addEventListener('change', onFilterChange);
   featuresFilter.addEventListener('change', onFilterChange, true);
-
 })();

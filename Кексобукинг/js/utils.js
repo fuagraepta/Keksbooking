@@ -27,7 +27,7 @@ var utils = {
     // Функция  получения массива с произвольной длиной
     'getRandomArrayLength': function (someArray) {
       var randomArray = [];
-      for (var i = 0; i <= window.utils.getRandomValue(someArray.length); i++) {
+      for (var i = 0; i <= this.getRandomValue(someArray.length); i++) {
         randomArray.push(someArray[i]);
       }
       return randomArray;
@@ -61,6 +61,7 @@ var utils = {
         errorPopup.classList.add('hidden')
       }, 10000);
     },
+    // Устранение дребезга
     'debounce': function (cb) {
       var lastTimeout = null;
 
