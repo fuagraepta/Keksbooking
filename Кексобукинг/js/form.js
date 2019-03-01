@@ -49,6 +49,71 @@
     }
   }, true);
 
+  // Добавление аватарки пользователя
+  var avatarFileChooser = noticeForm.querySelector('.notice__photo input[type=file]');
+  var avatarPreview = noticeForm.querySelectorAll('.notice__preview img');
+  var dropZone = noticeForm.querySelectorAll('.drop-zone');
+  var FILE_TYPES = ['png', 'jpg', 'jpeg', 'svg'];
+
+  // Добавление аватарки пользователя через input file
+  var addPicture = function (preview, picture) {
+    var files = picture ? picture : avatarFileChooser.files;
+    for (var i = 0; i < files.length; i++) {
+      var fileName = files[i].name.toLowerCase();
+
+      var matches = FILE_TYPES.some(function (it) {
+        return fileName.endsWith(it);
+      });
+
+      if (matches) {
+        var reader = new FileReader();
+
+        reader.addEventListener('load', function () {
+          preview.forEach(function (img) {
+            img.src = reader.result;
+          });
+        });
+        reader.readAsDataURL(files[i]);
+      }
+    }
+  };
+
+  avatarFileChooser.addEventListener('change', function () {
+    addPicture(avatarPreview);
+  });
+
+  var onDropZoneDragenter = function (evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+  };
+
+  // Добавление аватарки пользователя с помощью Drag and Drop
+  var onDropZoneDragover = function (evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+  };
+
+  var onDropZoneDrop = function (evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    var dt = evt.dataTransfer;
+    var files = dt.files;
+    addPicture(avatarPreview, files);
+  };
+
+  dropZone[0].addEventListener('dragenter', onDropZoneDragenter, false);
+  dropZone[0].addEventListener('dragover', onDropZoneDragover, false);
+  dropZone[0].addEventListener('drop', onDropZoneDrop, false);
+
+  // Добавление фотографий жилья
+  var photoFileChooser = noticeForm.querySelector('.form__photo-container input[type=file]');
+  var housePreview = noticeForm.querySelectorAll('.form__photo-container img');
+
+  photoFileChooser.addEventListener('change', function () {
+    addPicture(housePreview);
+  });
+
+
   // При выборе типа жилья меняется минимальная стоимость
   var selectType = noticeForm.querySelector('#type');
   var price = noticeForm.querySelector('#price');
