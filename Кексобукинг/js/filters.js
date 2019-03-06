@@ -24,7 +24,6 @@
   };
 
   window.filterPins = function () {
-
     // Фильтр по типу жилья
     var checkType = function (advertising) {
       return (typeFilter.value === advertising.offer.type) || (typeFilter.value === ANY_VALUE);

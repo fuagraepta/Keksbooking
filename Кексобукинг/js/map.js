@@ -19,7 +19,7 @@
     },
     // Деактивация карты
     'disabledMap': function () {
-      map.cityMap.classList.add('map--faded');
+      this.cityMap.classList.add('map--faded');
       disabledFilters();
       setMainPinCoordsDefault();
       window.pin.removePin();
@@ -58,9 +58,9 @@
 
   // Снятие маркировки с метки
   var unmarkPin = function (markPins) {
-    for (var i = 1; i < markPins.length; i++) {
-      markPins[i].classList.remove('map__pin--active');
-    }
+    markPins.forEach(function (pin) {
+      pin.classList.remove('map__pin--active');
+    });
   };
 
   // Сброс координат основной метки по умолчанию
@@ -104,25 +104,21 @@
   };
 
   // Drag and drop основной метки объявления
+  var Coords = function (x, y) {
+    this.x = x;
+    this.y = y;
+  };
+
   mapPinMain.addEventListener('mousedown', function (evt) {
 
-    var startCoords = {
-      x: evt.clientX,
-      y: evt.clientY
-    };
+    var startCoords = new Coords(evt.clientX, evt.clientY);
 
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
-      var shift = {
-        x: startCoords.x - moveEvt.clientX,
-        y: startCoords.y - moveEvt.clientY
-      };
+      var shift = new Coords(startCoords.x - moveEvt.clientX, startCoords.y - moveEvt.clientY);
 
-      startCoords = {
-        x: moveEvt.clientX,
-        y: moveEvt.clientY
-      };
+      startCoords = new Coords(moveEvt.clientX, moveEvt.clientY);
 
       if (mapPinMain.offsetTop < MapSetting.Y_MIN_COORD) {
         mapPinMain.style.top = MapSetting.Y_MIN_COORD + 'px';
