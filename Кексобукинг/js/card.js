@@ -15,9 +15,9 @@
 
   var getCard = function (advertising) {
     var popup = mapCardTemplate.cloneNode(true);
-    var popupAvatar = window.utils.getDefiniteElement(popup, '.popup__avatar'); // Аватарка
+    var popupAvatar = window.utils.getDefiniteElement(popup, '.popup__avatar');// Аватарка
     popupAvatar.src = advertising.author.avatar;
-    var popupFeatures = popup.querySelectorAll('.feature'); // Преимущества
+    var popupFeatures = popup.querySelectorAll('.feature');// Преимущества
 
     for (var i = 0; i < popupFeatures.length; i++) {
       if (i > advertising.offer.features.length) {
@@ -25,7 +25,7 @@
       }
     }
 
-    var popupPhotos = window.utils.getDefiniteElement(popup, '.popup__photos'); // Фотографии объявления
+    var popupPhotos = window.utils.getDefiniteElement(popup, '.popup__photos');// Фотографии объявления
     var popupPhotoItem = popupPhotos.querySelector('li');
 
     for (var j = 0; j < advertising.offer.photos.length; j++) {

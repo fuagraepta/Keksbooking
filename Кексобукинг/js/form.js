@@ -49,7 +49,7 @@
 
   disabledForm();
 
-  //  Размещение делегирование на форму. При отправке подсвечивает не корректно заполненные поля.
+  // Размещение делегирование на форму. При отправке подсвечивает не корректно заполненные поля.
   noticeForm.addEventListener('invalid', function (evt) {
     var target = evt.target;
     if (target.validity.valid === false) {
@@ -125,13 +125,6 @@
     document.removeEventListener('click', onDocumentClick);
   };
 
-  // Открыть popup
-  var openSuccessPopup = function () {
-    successPopup.classList.remove('hidden');
-    document.addEventListener('keydown', onSuccessPopupPressEsc);
-    document.addEventListener('click', onDocumentClick);
-  };
-
   // Закрыть popup по нажатию на ESC
   var onSuccessPopupPressEsc = function (escEvt) {
     window.utils.isEscPressEvent(escEvt, closeSuccessPopup);
@@ -140,6 +133,13 @@
   // Закрыть popup по нажатию  на любую область документа
   var onDocumentClick = function () {
     closeSuccessPopup();
+  };
+
+  // Открыть popup
+  var openSuccessPopup = function () {
+    successPopup.classList.remove('hidden');
+    document.addEventListener('keydown', onSuccessPopupPressEsc);
+    document.addEventListener('click', onDocumentClick);
   };
 
   // Отправка данных на сервер без перезагрузки страницы

@@ -5,14 +5,13 @@
   var ESC_KEYCODE = 27;
   var DEBOUNCE_INTERVAL = 50;
 
-var utils = {
+  var utils = {
     // Функия получения случайного значения
     'getRandomValue': function (max, min) {
       if (min) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
-      } else {
-        return Math.floor(Math.random() * (max));
       }
+      return Math.floor(Math.random() * (max));
     },
     // Функция случайной сортировки массива
     'getRandomArray': function (sourceArray) {
