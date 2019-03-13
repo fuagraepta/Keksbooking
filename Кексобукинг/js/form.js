@@ -6,22 +6,14 @@
   var allNoticeFormFieldset = noticeForm.querySelectorAll('fieldset');
   var allNoticeFormInputs = noticeForm.querySelectorAll('input');
   var inputAddress = noticeForm.querySelector('#address');
-  var selectType = noticeForm.querySelector('#type');
-  var price = noticeForm.querySelector('#price');
-  var timein = noticeForm.querySelector('#timein');
-  var timeout = noticeForm.querySelector('#timeout');
-  var roomNumber = noticeForm.querySelector('#room_number');
-  var roomNumberTip = noticeForm.querySelector('.room_number_tip');
-  var capacity = noticeForm.querySelector('#capacity');
-  var reset = noticeForm.querySelector('.form__reset');
 
-  window.form = {
+  var form = {
     // Активация формы для подачи объявления
     'enabledForm': function () {
       noticeForm.classList.remove('notice__form--disabled');
-      for (var i = 0; i < allNoticeFormFieldset.length; i++) {
-        allNoticeFormFieldset[i].disabled = false;
-      }
+      allNoticeFormFieldset.forEach(function (input) {
+        input.disabled = false;
+      });
     },
     // Получение  начального адреса основной метки
     'getMainPinAdress': function () {
@@ -33,39 +25,29 @@
   var setInputValueDefault = function () {
     var textArea = noticeForm.querySelector('textarea');
     textArea.value = '';
-    for (var i = 0; i < allNoticeFormInputs.length; i++) {
-      allNoticeFormInputs[i].value = '';
-      allNoticeFormInputs[i].checked = false;
-    }
+    allNoticeFormInputs.forEach(function (input) {
+      input.value = '';
+      input.checked = false;
+    });
+  };
+
+  // Сброс аватарки и фотографий жилья по умолчанию
+  var removePhoto = function () {
+    var photos = noticeForm.querySelectorAll('img');
+    photos.forEach(function (img) {
+      img.src = 'img/muffin.png';
+    });
   };
 
   // Деактивация формы для подачи объявления
   var disabledForm = function () {
     noticeForm.classList.add('notice__form--disabled');
-    for (var i = 0; i < allNoticeFormFieldset.length; i++) {
-      allNoticeFormFieldset[i].disabled = true;
-    }
+    allNoticeFormFieldset.forEach(function (activeInput) {
+      activeInput.disabled = true;
+    });
   };
 
   disabledForm();
-
-  // Функция синхронизации двух похожих(по длине) селектов
-  var synchTime = function (selectOne, selectTwo) {
-    selectOne.value = selectTwo.value;
-  };
-
-  // Вывод подсказки для не корректно заполненных полей
-  var addTip = function (invalidElement, errorTip, tipMessage) {
-    if (invalidElement.setCustomValidity !== '') {
-      errorTip.classList.remove('hidden');
-      errorTip.textContent = tipMessage;
-    }
-  };
-
-  // Скрыть подсказку для корректно заполненных полей
-  var removeTip = function (tip) {
-    tip.classList.add('hidden');
-  };
 
   //  Размещение делегирование на форму. При отправке подсвечивает не корректно заполненные поля.
   noticeForm.addEventListener('invalid', function (evt) {
@@ -75,45 +57,30 @@
     }
   }, true);
 
-  // Показывает сообщение для описания, в случаи не корректно заполненного поля
-  // При желании можно отключить
-  var title = noticeForm.querySelector('#title');
-  var titleTip = noticeForm.querySelector('.title_tip');
-
-  title.addEventListener('input', function () {
-    if (title.value.length < 30) {
-      title.setCustomValidity('Описание должно стотоять минимум из 30 символов');
-      addTip(title, titleTip, 'Описание должно стотоять минимум из 30 символов');
-    } else if (title.value.length > 100) {
-      title.setCustomValidity('Имя не должно превышать 100 символов');
-      addTip(title, titleTip, 'Имя не должно превышать 100 символов');
-    } else {
-      title.setCustomValidity('');
-      removeTip(titleTip);
-    }
-  });
-
   // При выборе типа жилья меняется минимальная стоимость
+  var selectType = noticeForm.querySelector('#type');
+  var price = noticeForm.querySelector('#price');
+  var typeToMinPrice = {
+    'bungalo': 0,
+    'flat': 1000,
+    'house': 5000,
+    'palace': 10000
+  };
+
   selectType.addEventListener('input', function () {
-    if (selectType.value === 'flat') {
-      price.min = 1000;
-      price.placeholder = 1000;
-    }
-    if (selectType.value === 'bungalo') {
-      price.min = 0;
-      price.placeholder = 0;
-    }
-    if (selectType.value === 'house') {
-      price.min = 5000;
-      price.placeholder = 5000;
-    }
-    if (selectType.value === 'palace') {
-      price.min = 10000;
-      price.placeholder = 10000;
-    }
+    price.min = typeToMinPrice[selectType.value];
+    price.placeholder = 'от ' + price.min;
   });
+
+  // Функция синхронизации двух похожих(по длине) селектов
+  var synchTime = function (selectOne, selectTwo) {
+    selectOne.value = selectTwo.value;
+  };
 
   // Время заезда синхронизируется со временем выезда
+  var timein = noticeForm.querySelector('#timein');
+  var timeout = noticeForm.querySelector('#timeout');
+
   timein.addEventListener('change', function () {
     synchTime(timeout, timein);
   });
@@ -122,25 +89,20 @@
   });
 
   // Синхронизация комнат с количеством гостей
+  var roomNumber = noticeForm.querySelector('#room_number');
+  var capacity = noticeForm.querySelector('#capacity');
+
   var sinchRoomAndCapacity = function () {
     if (roomNumber.value === '1' && capacity.value !== '1') {
       roomNumber.setCustomValidity('для 1 гостя');
-      addTip(roomNumber, roomNumberTip, 'для 1 гостя');
-    } else if (roomNumber.value === '2' && capacity.value === '0') {
+    } else if (roomNumber.value === '2' && capacity.value === '0' || capacity.value === '3') {
       roomNumber.setCustomValidity('для 2 гостей или для 1 гостя');
-      addTip(roomNumber, roomNumberTip, 'не более 2 гостей');
-    } else if (roomNumber.value === '2' && capacity.value === '3') {
-      roomNumber.setCustomValidity('для 2 гостей или для 1 гостя');
-      addTip(roomNumber, roomNumberTip, 'не более 2 гостей');
     } else if (roomNumber.value === '3' && capacity.value === '0') {
       roomNumber.setCustomValidity('для 3 гостей, для 2 гостей или для 1 гостя');
-      addTip(roomNumber, roomNumberTip, 'не более 3 гостей');
     } else if (roomNumber.value === '100' && capacity.value !== '0') {
       roomNumber.setCustomValidity('не для гостей');
-      addTip(roomNumber, roomNumberTip, 'не для гостей');
     } else {
       roomNumber.setCustomValidity('');
-      removeTip(roomNumberTip);
     }
   };
 
@@ -165,7 +127,6 @@
 
   // Открыть popup
   var openSuccessPopup = function () {
-    successPopup.tabIndex = 10;
     successPopup.classList.remove('hidden');
     document.addEventListener('keydown', onSuccessPopupPressEsc);
     document.addEventListener('click', onDocumentClick);
@@ -190,15 +151,17 @@
   });
 
   // Сброс страницы в исходное состояние.
+  var reset = noticeForm.querySelector('.form__reset');
+
   var setDefaultSetup = function () {
-    removeTip(roomNumberTip);
-    removeTip(titleTip);
     disabledForm();
     setInputValueDefault();
+    removePhoto();
     window.map.disabledMap();
   };
 
   reset.addEventListener('click', function () {
     setDefaultSetup();
   });
+  window.form = form;
 })();

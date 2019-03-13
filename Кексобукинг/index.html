@@ -103,7 +103,6 @@
       <fieldset class="form__element form__element--wide">
         <label for="title">Заголовок объявления</label>
         <input id="title" name="title" type="text" minlength="30" maxlenght="100" placeholder="Милая, уютная квартирка в центре Токио" required>
-        <div class="title_tip tip hidden"></div>
       </fieldset>
 
       <fieldset class="form__element form__element--wide">
@@ -148,7 +147,6 @@
           <option value="3" selected>3 комнаты</option>
           <option value="100">100 комнат</option>
         </select>
-        <div class="room_number_tip tip hidden"></div>
       </fieldset>
 
       <fieldset class="form__element">
@@ -192,8 +190,26 @@
         <label>Фотографии жилья</label>
         <div class="form__photo-container">
           <div class="upload">
-            <input type="file" id="images">
+            <input type="file" id="images" multiple>
             <label for="images" class="drop-zone">Загрузите или&nbsp;перетащите сюда фото</label>
+          </div>
+          <div class="form__photo  form__photo--empty">
+            <img src="img/muffin.png" alt="Фотография жилья 1"  width="65" height="65">
+          </div>
+          <div class="form__photo  form__photo--empty">
+            <img src="img/muffin.png" alt="Фотография жилья 2"  width="65" height="65">
+          </div>
+          <div class="form__photo  form__photo--empty">
+            <img src="img/muffin.png" alt="Фотография жилья 3"  width="65" height="65">
+          </div>
+          <div class="form__photo  form__photo--empty">
+            <img src="img/muffin.png" alt="Фотография жилья 4"  width="65" height="65">
+          </div>
+          <div class="form__photo  form__photo--empty">
+            <img src="img/muffin.png" alt="Фотография жилья 5"  width="65" height="65">
+          </div>
+          <div class="form__photo  form__photo--empty">
+            <img src="img/muffin.png" alt="Фотография жилья 6"  width="65" height="65">
           </div>
         </div>
       </fieldset>
@@ -257,13 +273,15 @@
     </div>
   </section>
 
-<script src="js/backend.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/data.js"></script>
-<script src="js/get-pin.js"></script>
-<script src="js/get-card.js"></script>
-<script src="js/map.js"></script>
-<script src="js/form.js"></script>
+  <script src="js/backend.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/advertising-data.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/pin.js"></script>
+  <script src="js/card.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/reader.js"></script>
+  <script src="js/form.js"></script>
 
 </body>
 </html>

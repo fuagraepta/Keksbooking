@@ -465,7 +465,7 @@ textarea:focus {
 }
 
 .notice {
-  margin: 0 120px;
+  margin: 0 100px;
   padding: 30px 0;
 }
 
@@ -529,7 +529,8 @@ textarea:focus {
   padding-bottom: 5px;
 }
 
-.form__element input {
+.form__element input,
+.form__element textarea {
   width: calc(100% - 20px);
 }
 
@@ -611,7 +612,29 @@ textarea:focus {
 }
 
 .form__photo-container {
+  display: flex;
+  flex-wrap: wrap;
+  width: 240px;
+}
+
+.form__photo-container .upload {
   width: 140px;
+  margin-right: 50px;
+}
+
+.form__photo {
+  margin-right: 10px;
+  margin-bottom: 10px;
+  width: 70px;
+  height: 70px;
+  background-color: #e4e4de;
+  border-radius: 5px;
+}
+
+.form__element--submit {
+  padding: 40px 0;
+
+  text-align: center;
 }
 
 .form__element--submit {
@@ -628,12 +651,6 @@ textarea:focus {
   text-decoration: underline;
   cursor: pointer;
   font: 14px Roboto, sans-serif;
-}
-
-.tip {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  color: #FF0000;
 }
 
 .invalid {

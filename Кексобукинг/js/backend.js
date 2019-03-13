@@ -1,8 +1,11 @@
 'use strict';
 
+// Модуль для работы с сервером
 (function () {
+  var SUCCESS_CODE = 200;
+  var READY_STATE_SUCCESS = 4
 
-  window.backend = {
+  var backend = {
     // Загрузка данных с сервера
     loadData: function (onLoad, onError) {
       var URL = 'https://js.dump.academy/keksobooking/data';
@@ -10,7 +13,7 @@
       xhr.responseType = 'json';
 
       xhr.addEventListener('load', function () {
-        if (xhr.status === 200) {
+        if (xhr.status === SUCCESS_CODE) {
           onLoad(xhr.response);
         } else {
           onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
@@ -25,7 +28,7 @@
         onError('Превышено время ожидания запроса');
       });
 
-      xhr.timeout = 20000;
+      xhr.timeout = 10000;
 
       xhr.open('GET', URL);
       xhr.send();
@@ -37,7 +40,7 @@
       xhr.responseType = 'json';
 
       xhr.addEventListener('load', function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
+        if (xhr.readyState === READY_STATE_SUCCESS && xhr.status === SUCCESS_CODE) {
           onLoad(xhr.response);
         } else {
           onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
@@ -52,4 +55,6 @@
       xhr.send(data);
     }
   };
+
+  window.backend = backend;
 })();
