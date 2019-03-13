@@ -29,13 +29,11 @@
     'synhPinAndCards': function (offersCard) {
       var pins = getPins();
       for (var i = 0; i < offersCard.length; i++) {
-        addOnPinClickClose(pins[i + 1]);
-        addOnPinClickOpen(pins[i + 1], offersCard[i]);
+        addOnPinClickCloseCard(pins[i + 1]);
+        addOnPinClickOpenCard(pins[i + 1], offersCard[i]);
       }
     }
   };
-
-  var mapPinMain = map.cityMap.querySelector('.map__pin--main');
 
   // Активация карты и формы для подачи объявления
   var enabledMap = function () {
@@ -44,6 +42,20 @@
     window.form.enabledForm();
     window.filterPins();
   };
+
+  var mapFilter = map.cityMap.querySelector('.map__filters-container');
+
+  // Активация фильта
+  var enabledFilters = function () {
+    mapFilter.classList.remove('hidden');
+  };
+
+  // Блокировка фильтра
+  var disabledFilters = function () {
+    mapFilter.classList.add('hidden');
+  };
+
+  disabledFilters();
 
   // Получение Элементов метки после активации карты
   var getPins = function () {
@@ -64,27 +76,15 @@
   };
 
   // Сброс координат основной метки по умолчанию
+  var mapPinMain = map.cityMap.querySelector('.map__pin--main');
+
   var setMainPinCoordsDefault = function () {
     mapPinMain.style.left = window.utils.getHalf(MapSetting.WIDTH) + 'px';
     mapPinMain.style.top = window.utils.getHalf(MapSetting.HEIGHT) + 'px';
   };
 
-  var mapFilter = map.cityMap.querySelector('.map__filters-container');
-
-  // Блокировка фильтра
-  var disabledFilters = function () {
-    mapFilter.classList.add('hidden');
-  };
-
-  disabledFilters();
-
-  // Активация фильта
-  var enabledFilters = function () {
-    mapFilter.classList.remove('hidden');
-  };
-
   // Добавление обработчиков событий для открытия объявления по щелчку на метку
-  var addOnPinClickOpen = function (pin, offer) {
+  var addOnPinClickOpenCard = function (pin, offer) {
     if (pin) {
       pin.addEventListener('click', function () {
         window.card.openPopup(offer);
@@ -94,7 +94,7 @@
   };
 
   // Добавление обработчиков событий для закрытия объявления по щелчку на другую метку
-  var addOnPinClickClose = function (mark) {
+  var addOnPinClickCloseCard = function (mark) {
     if (mark) {
       mark.addEventListener('click', function () {
         window.card.closePopup();

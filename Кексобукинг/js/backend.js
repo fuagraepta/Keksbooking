@@ -4,6 +4,7 @@
 (function () {
   var SUCCESS_CODE = 200;
   var READY_STATE_SUCCESS = 4
+  var TIMEOUT_LIMIT = 10000;
 
   var backend = {
     // Загрузка данных с сервера
@@ -28,7 +29,7 @@
         onError('Превышено время ожидания запроса');
       });
 
-      xhr.timeout = 10000;
+      xhr.timeout = TIMEOUT_LIMIT;
 
       xhr.open('GET', URL);
       xhr.send();
