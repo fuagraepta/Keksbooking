@@ -9,7 +9,7 @@
   var backend = {
     // Загрузка данных с сервера
     loadData: function (onLoad, onError) {
-      var URL = 'https://js.dump.academy/keksobooking/data';
+      var URL = 'https://javascript.pages.academy/keksobooking/data';
       var xhr = new XMLHttpRequest();
       xhr.responseType = 'json';
 
@@ -36,7 +36,7 @@
     },
     // Отправка данных на сервер
     saveData: function (data, onLoad, onError) {
-      var URL = 'https://js.dump.academy/keksobooking';
+      var URL = 'https://javascript.pages.academy/keksobooking';
       var xhr = new XMLHttpRequest();
       xhr.responseType = 'json';
 
